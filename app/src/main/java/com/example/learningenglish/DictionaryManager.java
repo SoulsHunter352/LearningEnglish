@@ -22,7 +22,7 @@ public class DictionaryManager {
     private static List<String> keys = new ArrayList<>();
 
     public static void loadDictionary(Context context){
-        dictionary = loadFromAssets(context);
+        dictionary = loadFromAssets2(context);
         keys = new ArrayList<>(dictionary.keySet());
     }
     private static Map<String, String> loadFromAssets(Context context){
@@ -48,6 +48,50 @@ public class DictionaryManager {
             }
         }
         return parseData(lines);
+    }
+
+    private static Map<String, String> loadFromAssets2(Context context){
+        BufferedReader reader = null;
+        List<String> lines = new ArrayList<>();
+        Map<String, String> newDictionary = new HashMap<>();
+        try{
+            reader = new BufferedReader(new InputStreamReader(context.getAssets().open("mueller.dict"), StandardCharsets.UTF_8));
+            String line;
+            int lineIndex = 0;
+            int translatedWords = 0;
+            List<String> currentWordLines = new ArrayList<>();
+
+            while((line = reader.readLine()) != null){
+                // lines.add(line);
+                if(!line.isEmpty() && Character.isLetter(line.charAt(0))){
+                    if(!currentWordLines.isEmpty()){
+                        String word = currentWordLines.get(0);
+                        String translation = getTranslation(currentWordLines);
+                        if(translation != null){
+                            newDictionary.put(word, translation);
+                            translatedWords += 1;
+                        }
+                        currentWordLines = new ArrayList<>();
+                    }
+                }
+                currentWordLines.add(line);
+                lineIndex += 1;
+            }
+            Log.d("Количество слов ", "" + translatedWords);
+        }
+        catch (IOException e){
+            Log.d("Ошибка чтения", "Ошибка чтения файла");
+        }
+        finally {
+            if (reader != null){
+                try{
+                    reader.close();
+                } catch (IOException e) {
+                    Log.d("Ошибка при закрытии", "Ошибка при закрытии буфера чтения");
+                }
+            }
+        }
+        return newDictionary;
     }
 
     private static Map<String, String> parseData(List<String> lines){

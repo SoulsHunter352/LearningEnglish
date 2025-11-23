@@ -12,6 +12,8 @@ import android.util.Log;
 public class AlarmScheduler {
     public static void startNotifications(Context context, long intervalMillis, boolean mode){
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        long nextTrigger = System.currentTimeMillis() + intervalMillis;
+        DictionaryManager.loadDictionary(context);
         String word = DictionaryManager.getRandomWord();
         String translation = DictionaryManager.getTranslation(word);
 
@@ -23,8 +25,8 @@ public class AlarmScheduler {
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        // long intervalMillis = 10000;
-        long nextTrigger = System.currentTimeMillis() + intervalMillis;
+
+        //long nextTrigger = System.currentTimeMillis() + intervalMillis;
 
         // Устанавливаем повторяющийся алёрм
         //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,

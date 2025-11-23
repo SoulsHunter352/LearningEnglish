@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        DictionaryManager.loadDictionary(this);
+        //DictionaryManager.loadDictionary(this);
 
         configureNumberPickers();
         createNotificationChannel();
