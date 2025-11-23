@@ -69,5 +69,14 @@
         app:layout_constraintRight_toRightOf="parent"
         android:id="@+id/mode"
         />
+    <Button
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/mode"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="20dp"
+        android:id="@+id/save_button"
+        android:text="@string/save"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

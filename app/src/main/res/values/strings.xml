@@ -6,4 +6,5 @@
     <string name="checking_mode">Режим проверки</string>
     <string name="channel_name">LearningEnglishChannel</string>
     <string name="channel_description">Notification channel for Learning English</string>
+    <string name="save">Сохранить</string>
 </resources>

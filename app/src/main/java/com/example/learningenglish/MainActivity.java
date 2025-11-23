@@ -3,13 +3,12 @@ package com.example.learningenglish;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.Button;
 import android.widget.NumberPicker;
 
 import androidx.activity.EdgeToEdge;
@@ -20,10 +19,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
 
 public class MainActivity extends AppCompatActivity {
     private NumberPicker hoursPicker;
@@ -31,11 +30,12 @@ public class MainActivity extends AppCompatActivity {
     private NumberPicker secondsPicker;
     String CHANNEL_ID = "LE8712";
     int NOTIFICATION_ID = 5123;
+    SharedPreferences prefs;
     private final ActivityResultLauncher<String> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
         @Override
         public void onActivityResult(Boolean result) {
             if (result){
-                sendNotification();
+                AlarmScheduler.startNotifications(MainActivity.this, 10000);
             }
         }
     });
@@ -51,12 +51,43 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        prefs = getSharedPreferences("LearningEnglish", MODE_PRIVATE);
         hoursPicker = findViewById(R.id.hours_picker);
         minutesPicker = findViewById(R.id.minutes_picker);
         secondsPicker = findViewById(R.id.seconds_picker);
+        Button saveButton = findViewById(R.id.save_button);
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveSettings();
+            }
+        });
+
         configureNumberPickers();
         createNotificationChannel();
-        sendNotification();
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            activityResultLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+        }
+        else{
+            AlarmScheduler.startNotifications(this, getCurrentInterval());
+        }
+    }
+
+    protected void saveSettings(){
+        SharedPreferences.Editor prefEditor = prefs.edit();
+        prefEditor.putInt("hours", hoursPicker.getValue());
+        prefEditor.putInt("minutes", minutesPicker.getValue());
+        prefEditor.putInt("seconds", secondsPicker.getValue());
+        prefEditor.apply();
+        AlarmScheduler.stopAlarms(this);
+        AlarmScheduler.startNotifications(this, getCurrentInterval());
+    }
+
+    protected int getCurrentInterval(){
+        int hours = hoursPicker.getValue();
+        int minutes = minutesPicker.getValue();
+        int seconds = secondsPicker.getValue();
+        return seconds * 1000 + minutes * 60 * 1000 + hours * 60 * 60 * 1000;
     }
 
     protected void configureNumberPickers(){
@@ -73,6 +104,8 @@ public class MainActivity extends AppCompatActivity {
             hours[i] = i + "ч";
         }
         hoursPicker.setDisplayedValues(hours);
+        int currentHours = prefs.getInt("hours", 0);
+        hoursPicker.setValue(currentHours);
     }
 
     protected void configureMinutesPicker(){
@@ -83,6 +116,8 @@ public class MainActivity extends AppCompatActivity {
             minutes[i] = i + "мин";
         }
         minutesPicker.setDisplayedValues(minutes);
+        int currentMinutes = prefs.getInt("minutes", 0);
+        minutesPicker.setValue(currentMinutes);
     }
     protected void configureSecondsPicker(){
         secondsPicker.setMinValue(0);
@@ -92,6 +127,8 @@ public class MainActivity extends AppCompatActivity {
             seconds[i] = i + "с";
         }
         secondsPicker.setDisplayedValues(seconds);
+        int currentSeconds = prefs.getInt("seconds", 0);
+        secondsPicker.setValue(currentSeconds);
     }
 
     protected void createNotificationChannel(){
@@ -104,19 +141,5 @@ public class MainActivity extends AppCompatActivity {
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
-    }
-
-    protected void sendNotification(){
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle("My notification")
-                .setContentText("Hello World!")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setAutoCancel(true);
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            activityResultLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
-            return;
-        }
-        NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, builder.build());
     }
 }
