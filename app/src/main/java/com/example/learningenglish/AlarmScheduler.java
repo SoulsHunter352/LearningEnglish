@@ -12,9 +12,15 @@ import android.util.Log;
 public class AlarmScheduler {
     public static void startNotifications(Context context, long intervalMillis, boolean mode){
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        String word = DictionaryManager.getRandomWord();
+        String translation = DictionaryManager.getTranslation(word);
+
         Intent intent = new Intent(context, TimeNotification.class);
         intent.putExtra("INTERVAL", intervalMillis);
         intent.putExtra("MODE", mode);
+        intent.putExtra("TITLE", "Новое слово");
+        intent.putExtra("TEXT", word + " - " + translation);
+
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         // long intervalMillis = 10000;

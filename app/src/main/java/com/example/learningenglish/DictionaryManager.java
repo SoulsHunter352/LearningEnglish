@@ -12,14 +12,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DictionaryManager {
     private static Map<String, String> dictionary = new HashMap<>();
+    private static Random random = new Random();
+    private static List<String> keys = new ArrayList<>();
 
     public static void loadDictionary(Context context){
         dictionary = loadFromAssets(context);
+        keys = new ArrayList<>(dictionary.keySet());
     }
     private static Map<String, String> loadFromAssets(Context context){
         BufferedReader reader = null;
@@ -81,5 +85,13 @@ public class DictionaryManager {
             }
         }
         return null;
+    }
+
+    public static String getRandomWord(){
+        return keys.get(random.nextInt(keys.size()));
+    }
+
+    public static String getTranslation(String word){
+        return dictionary.getOrDefault(word, "");
     }
 }

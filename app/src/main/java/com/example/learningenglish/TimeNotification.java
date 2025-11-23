@@ -11,10 +11,13 @@ public class TimeNotification extends BroadcastReceiver {
     int NOTIFICATION_ID = 5123;
     @Override
     public void onReceive(Context context, Intent intent) {
+        String title = intent.getStringExtra("TITLE");
+        String text = intent.getStringExtra("TEXT");
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "LE8712")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle("My notification")
-                .setContentText("Hello World!")
+                .setContentTitle(title)
+                .setContentText(text)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(NOTIFICATION_ID, builder.build());
