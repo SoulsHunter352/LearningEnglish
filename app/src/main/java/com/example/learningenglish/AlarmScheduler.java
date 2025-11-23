@@ -10,10 +10,11 @@ import android.os.Build;
 import android.util.Log;
 
 public class AlarmScheduler {
-    public static void startNotifications(Context context, long intervalMillis){
+    public static void startNotifications(Context context, long intervalMillis, boolean mode){
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, TimeNotification.class);
         intent.putExtra("INTERVAL", intervalMillis);
+        intent.putExtra("MODE", mode);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         // long intervalMillis = 10000;

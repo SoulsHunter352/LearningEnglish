@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
+import android.widget.ToggleButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultCallback;
@@ -17,8 +18,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -28,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private NumberPicker hoursPicker;
     private NumberPicker minutesPicker;
     private NumberPicker secondsPicker;
+    private ToggleButton mode;
     String CHANNEL_ID = "LE8712";
     int NOTIFICATION_ID = 5123;
     SharedPreferences prefs;
@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onActivityResult(Boolean result) {
             if (result){
-                AlarmScheduler.startNotifications(MainActivity.this, 10000);
+                startNotifications();
             }
         }
     });
@@ -55,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
         hoursPicker = findViewById(R.id.hours_picker);
         minutesPicker = findViewById(R.id.minutes_picker);
         secondsPicker = findViewById(R.id.seconds_picker);
+
+        mode = findViewById(R.id.mode);
+        mode.setChecked(prefs.getBoolean("mode", false));
+
         Button saveButton = findViewById(R.id.save_button);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
             activityResultLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
         }
         else{
-            AlarmScheduler.startNotifications(this, getCurrentInterval());
+            AlarmScheduler.startNotifications(this, getCurrentInterval(), mode.isChecked());
         }
     }
 
@@ -78,9 +82,14 @@ public class MainActivity extends AppCompatActivity {
         prefEditor.putInt("hours", hoursPicker.getValue());
         prefEditor.putInt("minutes", minutesPicker.getValue());
         prefEditor.putInt("seconds", secondsPicker.getValue());
+        prefEditor.putBoolean("mode", mode.isChecked());
         prefEditor.apply();
         AlarmScheduler.stopAlarms(this);
-        AlarmScheduler.startNotifications(this, getCurrentInterval());
+        AlarmScheduler.startNotifications(this, getCurrentInterval(), mode.isChecked());
+    }
+
+    protected void startNotifications(){
+        AlarmScheduler.startNotifications(this, getCurrentInterval(), mode.isChecked());
     }
 
     protected int getCurrentInterval(){
