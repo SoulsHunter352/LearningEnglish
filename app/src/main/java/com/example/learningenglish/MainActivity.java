@@ -1,5 +1,9 @@
 package com.example.learningenglish;
 
+import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -9,7 +13,13 @@ import android.widget.EditText;
 import android.widget.NumberPicker;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -19,6 +29,16 @@ public class MainActivity extends AppCompatActivity {
     private NumberPicker hoursPicker;
     private NumberPicker minutesPicker;
     private NumberPicker secondsPicker;
+    String CHANNEL_ID = "LE8712";
+    int NOTIFICATION_ID = 5123;
+    private final ActivityResultLauncher<String> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
+        @Override
+        public void onActivityResult(Boolean result) {
+            if (result){
+                sendNotification();
+            }
+        }
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
         minutesPicker = findViewById(R.id.minutes_picker);
         secondsPicker = findViewById(R.id.seconds_picker);
         configureNumberPickers();
+        createNotificationChannel();
+        sendNotification();
     }
 
     protected void configureNumberPickers(){
@@ -70,5 +92,31 @@ public class MainActivity extends AppCompatActivity {
             seconds[i] = i + "с";
         }
         secondsPicker.setDisplayedValues(seconds);
+    }
+
+    protected void createNotificationChannel(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.channel_name);
+            String description = getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    protected void sendNotification(){
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle("My notification")
+                .setContentText("Hello World!")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setAutoCancel(true);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            activityResultLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            return;
+        }
+        NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, builder.build());
     }
 }
