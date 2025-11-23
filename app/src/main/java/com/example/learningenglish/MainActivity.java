@@ -67,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        DictionaryManager.loadDictionary(this);
+
         configureNumberPickers();
         createNotificationChannel();
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
