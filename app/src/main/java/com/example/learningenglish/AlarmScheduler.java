@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 
+import java.util.Objects;
+
 public class AlarmScheduler {
     public static void startNotifications(Context context, long intervalMillis, boolean mode){
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -19,18 +21,30 @@ public class AlarmScheduler {
 
         Intent intent = new Intent(context, TimeNotification.class);
         intent.putExtra("INTERVAL", intervalMillis);
-        intent.putExtra("MODE", mode);
-        intent.putExtra("TITLE", "Новое слово");
-        intent.putExtra("TEXT", word + " - " + translation);
+        if(!mode){
+            intent.putExtra("MODE", "LEARNING");
+        }
+        else{
+            intent.putExtra("MODE", "TESTING");
+        }
+
+        if(!mode){
+            intent.putExtra("TITLE", "Новое слово");
+            intent.putExtra("TEXT", word + " - " + translation);
+        }
+        else{
+            String word2;
+            while(Objects.equals(word2 = DictionaryManager.getRandomWord(), word)){
+            }
+            String translation2 = DictionaryManager.getTranslation(word2);
+            intent.putExtra("TITLE", "Переведите слово");
+            intent.putExtra("TEXT", word);
+            intent.putExtra("RIGHT_ANSWER", translation);
+            intent.putExtra("WRONG_ANSWER", translation2);
+        }
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
-        //long nextTrigger = System.currentTimeMillis() + intervalMillis;
-
-        // Устанавливаем повторяющийся алёрм
-        //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP,
-        //        firstTrigger, intervalMillis, pendingIntent);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (!alarmManager.canScheduleExactAlarms()) {
                 Log.w("AlarmScheduler", "Нет разрешения, пропускаем перезапуск");
