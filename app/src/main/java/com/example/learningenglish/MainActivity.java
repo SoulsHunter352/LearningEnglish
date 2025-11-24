@@ -1,5 +1,8 @@
 package com.example.learningenglish;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -10,6 +13,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import androidx.activity.EdgeToEdge;
@@ -17,6 +21,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -28,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private NumberPicker minutesPicker;
     private NumberPicker secondsPicker;
     private ToggleButton mode;
+    private TextView status;
+    private ConstraintLayout form;
     String CHANNEL_ID = "LE8712";
     int NOTIFICATION_ID = 5123;
     SharedPreferences prefs;
@@ -55,9 +62,10 @@ public class MainActivity extends AppCompatActivity {
         hoursPicker = findViewById(R.id.hours_picker);
         minutesPicker = findViewById(R.id.minutes_picker);
         secondsPicker = findViewById(R.id.seconds_picker);
-
+        form = findViewById(R.id.form);
         mode = findViewById(R.id.mode);
         mode.setChecked(prefs.getBoolean("mode", false));
+        status = findViewById(R.id.status);
 
         Button saveButton = findViewById(R.id.save_button);
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -75,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
             activityResultLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
         }
         else{
-            AlarmScheduler.startNotifications(this, getCurrentInterval(), mode.isChecked());
+            startNotificationsOnCreate();
         }
     }
 
@@ -86,12 +94,29 @@ public class MainActivity extends AppCompatActivity {
         prefEditor.putInt("seconds", secondsPicker.getValue());
         prefEditor.putBoolean("mode", mode.isChecked());
         prefEditor.apply();
-        AlarmScheduler.stopAlarms(this);
-        AlarmScheduler.startNotifications(this, getCurrentInterval(), mode.isChecked());
+        //AlarmScheduler.stopAlarms(this);
+        //AlarmScheduler.startNotifications(this, getCurrentInterval(), mode.isChecked());
+        status.setText("Сохранение настроек");
+        startNotifications();
+    }
+
+    protected void startNotificationsOnCreate(){
+        form.setVisibility(INVISIBLE);
+        status.setVisibility(VISIBLE);
+        new Thread(() ->{
+            AlarmScheduler.startNotifications(MainActivity.this, getCurrentInterval(), mode.isChecked());
+            runOnUiThread(() -> {
+                form.setVisibility(VISIBLE);
+                status.setVisibility(INVISIBLE);
+            });
+        }).start();
     }
 
     protected void startNotifications(){
-        AlarmScheduler.startNotifications(this, getCurrentInterval(), mode.isChecked());
+        new Thread(() ->{
+            AlarmScheduler.startNotifications(MainActivity.this, getCurrentInterval(), mode.isChecked());
+        }).start();
+        // AlarmScheduler.startNotifications(this, getCurrentInterval(), mode.isChecked());
     }
 
     protected int getCurrentInterval(){

@@ -20,63 +20,86 @@
         android:textColor="@color/black"
         android:id="@+id/title"/>
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        android:id="@+id/form">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/notification_label"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="100dp"
+            android:labelFor="@id/notification_time"
+            android:id="@+id/notification_label"
+            />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/notification_label"
+            android:id="@+id/notification_time">
+            <com.example.learningenglish.CustomNumberPicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:layout_margin="5dp"
+                android:id="@+id/hours_picker"/>
+            <com.example.learningenglish.CustomNumberPicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/minutes_picker"
+                android:layout_margin="5dp"
+                />
+            <com.example.learningenglish.CustomNumberPicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:id="@+id/seconds_picker"
+                />
+        </LinearLayout>
+        <ToggleButton
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:textOff="@string/learning_mode"
+            android:textOn="@string/checking_mode"
+            app:layout_constraintTop_toBottomOf="@id/notification_time"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:id="@+id/mode"
+            />
+        <Button
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/mode"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_marginTop="20dp"
+            android:id="@+id/save_button"
+            android:text="@string/save"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/notification_label"
-        android:textSize="20sp"
-        android:textColor="@color/black"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="100dp"
-        android:labelFor="@id/notification_time"
-        android:id="@+id/notification_label"
-        />
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:text="Загрузка данных...."
+        android:textSize="22sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/notification_label"
-        android:id="@+id/notification_time">
-        <com.example.learningenglish.CustomNumberPicker
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:layout_margin="5dp"
-            android:id="@+id/hours_picker"/>
-        <com.example.learningenglish.CustomNumberPicker
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/minutes_picker"
-            android:layout_margin="5dp"
-            />
-        <com.example.learningenglish.CustomNumberPicker
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:id="@+id/seconds_picker"
-            />
-    </LinearLayout>
-    <ToggleButton
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:textOff="@string/learning_mode"
-        android:textOn="@string/checking_mode"
-        app:layout_constraintTop_toBottomOf="@id/notification_time"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:id="@+id/mode"
-        />
-    <Button
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/mode"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="20dp"
-        android:id="@+id/save_button"
-        android:text="@string/save"/>
+        android:visibility="invisible"
+        android:id="@+id/status" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
