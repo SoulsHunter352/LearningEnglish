@@ -6,12 +6,14 @@ import static android.view.View.VISIBLE;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -35,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private ToggleButton mode;
     private TextView status;
     private ConstraintLayout form;
+    private CheckBox notificationStatus;
     String CHANNEL_ID = "LE8712";
     int NOTIFICATION_ID = 5123;
     SharedPreferences prefs;
@@ -43,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
         public void onActivityResult(Boolean result) {
             if (result){
                 startNotifications();
+            }
+            else{
+                showNoNotificationPermissionView();
             }
         }
     });
@@ -66,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
         mode = findViewById(R.id.mode);
         mode.setChecked(prefs.getBoolean("mode", false));
         status = findViewById(R.id.status);
+        notificationStatus = findViewById(R.id.notification_status);
+        notificationStatus.setChecked(prefs.getBoolean("notificationStatus", false));
 
         Button saveButton = findViewById(R.id.save_button);
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -76,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //DictionaryManager.loadDictionary(this);
+        loadData();
 
         configureNumberPickers();
         createNotificationChannel();
@@ -83,7 +92,8 @@ public class MainActivity extends AppCompatActivity {
             activityResultLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
         }
         else{
-            startNotificationsOnCreate();
+            if(notificationStatus.isChecked())
+                startNotifications();
         }
     }
 
@@ -93,18 +103,24 @@ public class MainActivity extends AppCompatActivity {
         prefEditor.putInt("minutes", minutesPicker.getValue());
         prefEditor.putInt("seconds", secondsPicker.getValue());
         prefEditor.putBoolean("mode", mode.isChecked());
+        prefEditor.putBoolean("notificationStatus", notificationStatus.isChecked());
         prefEditor.apply();
         //AlarmScheduler.stopAlarms(this);
         //AlarmScheduler.startNotifications(this, getCurrentInterval(), mode.isChecked());
         status.setText("Сохранение настроек");
-        startNotifications();
+        if(notificationStatus.isChecked())
+            startNotifications();
+        else{
+            AlarmScheduler.stopAlarms(this);
+        }
     }
 
-    protected void startNotificationsOnCreate(){
+    protected void loadData(){
+        // Функция для отображения загрузки и инициализации уведомлений при запуске приложения
         form.setVisibility(INVISIBLE);
         status.setVisibility(VISIBLE);
         new Thread(() ->{
-            AlarmScheduler.startNotifications(MainActivity.this, getCurrentInterval(), mode.isChecked());
+            DictionaryManager.loadDictionary(MainActivity.this);
             runOnUiThread(() -> {
                 form.setVisibility(VISIBLE);
                 status.setVisibility(INVISIBLE);
@@ -113,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void startNotifications(){
+        // Функция инициализации отправки уведомлений
         new Thread(() ->{
             AlarmScheduler.startNotifications(MainActivity.this, getCurrentInterval(), mode.isChecked());
         }).start();
@@ -177,5 +194,10 @@ public class MainActivity extends AppCompatActivity {
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
+    }
+    private void showNoNotificationPermissionView(){
+        form.setVisibility(INVISIBLE);
+        status.setText("Необходимы права для отправки уведомлений");
+        status.setVisibility(VISIBLE);
     }
 }

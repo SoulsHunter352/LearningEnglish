@@ -1,10 +1,13 @@
 package com.example.learningenglish;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 import androidx.core.app.NotificationCompat;
 
@@ -17,6 +20,12 @@ public class TimeNotification extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String mode = intent.getStringExtra("MODE");
+        SharedPreferences pref = context.getSharedPreferences("LearningEnglish", MODE_PRIVATE);
+        if(!pref.getBoolean("notificationStatus", false)){
+            NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            manager.cancel(NOTIFICATION_ID);
+            return;
+        }
 
         if(Objects.equals(mode, "LEARNING") | Objects.equals(mode, "CHECK_ANSWER")){
             receiveSimpleNotification(context, intent);
