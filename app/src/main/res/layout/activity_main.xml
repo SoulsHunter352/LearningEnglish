@@ -38,6 +38,7 @@
             app:layout_constraintRight_toRightOf="parent"
             android:id="@+id/notification_status"
             android:textColor="@color/black"
+            android:buttonTint="#5E5E5E"
             />
 
         <TextView
@@ -87,6 +88,8 @@
             app:layout_constraintTop_toBottomOf="@id/notification_time"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
+            android:backgroundTint="#B9B9B9"
+            android:textColor="@color/black"
             android:id="@+id/mode"
             />
         <Button
@@ -97,6 +100,8 @@
             app:layout_constraintRight_toRightOf="parent"
             android:layout_marginTop="20dp"
             android:id="@+id/save_button"
+            android:backgroundTint="#5E5E5E"
+            android:textColor="@color/white"
             android:text="@string/save"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
