@@ -13,30 +13,32 @@ import java.util.Objects;
 
 public class AlarmScheduler {
     public static void startNotifications(Context context, long intervalMillis, boolean mode){
+        // Получаем доступ к службе оповещения
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         long nextTrigger = System.currentTimeMillis() + intervalMillis;
-        DictionaryManager.loadDictionary(context);
+        if(DictionaryManager.getDictSize() == 0){  // Если словарь не загружен, то загружаем
+            DictionaryManager.loadDictionary(context);
+        }
         String word = DictionaryManager.getRandomWord();
         String translation = DictionaryManager.getTranslation(word);
 
+        // Создаем намерение для запуска BroadcastReceiver
         Intent intent = new Intent(context, TimeNotification.class);
         intent.putExtra("INTERVAL", intervalMillis);
-        if(!mode){
-            intent.putExtra("MODE", "LEARNING");
-        }
-        else{
-            intent.putExtra("MODE", "TESTING");
-        }
 
         if(!mode){
+            intent.putExtra("MODE", "LEARNING");
             intent.putExtra("TITLE", "Новое слово");
             intent.putExtra("TEXT", word + " - " + translation);
         }
         else{
+            // Получаем второе слово, для создания неверного варианта ответа
             String word2;
             while(Objects.equals(word2 = DictionaryManager.getRandomWord(), word)){
             }
+
             String translation2 = DictionaryManager.getTranslation(word2);
+            intent.putExtra("MODE", "TESTING");
             intent.putExtra("TITLE", "Переведите слово");
             intent.putExtra("TEXT", word);
             intent.putExtra("RIGHT_ANSWER", translation);
@@ -62,6 +64,6 @@ public class AlarmScheduler {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         alarmManager.cancel(pendingIntent);
-        Log.d("Alarm", "Алёрмы остановлены");
+        Log.d("Alarm", "Оповещения остановлены");
     }
 }

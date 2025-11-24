@@ -13,6 +13,7 @@ import java.util.Random;
 
 public class TimeNotification extends BroadcastReceiver {
     int NOTIFICATION_ID = 5123;
+    String CHANNEL_ID = "LE8712";
     @Override
     public void onReceive(Context context, Intent intent) {
         String mode = intent.getStringExtra("MODE");
@@ -30,7 +31,7 @@ public class TimeNotification extends BroadcastReceiver {
         String text = intent.getStringExtra("TEXT");
         String mode = intent.getStringExtra("MODE");
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "LE8712")
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(title)
                 .setContentText(text)
@@ -67,7 +68,7 @@ public class TimeNotification extends BroadcastReceiver {
 
         Random random = new Random();
         int rightPosition = random.nextInt(2);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "LE8712")
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setContentTitle(title)
                 .setContentText(text)

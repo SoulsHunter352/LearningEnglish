@@ -5,7 +5,6 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -22,35 +21,10 @@ public class DictionaryManager {
     private static List<String> keys = new ArrayList<>();
 
     public static void loadDictionary(Context context){
-        dictionary = loadFromAssets2(context);
+        dictionary = loadFromAssets(context);
         keys = new ArrayList<>(dictionary.keySet());
     }
     private static Map<String, String> loadFromAssets(Context context){
-        BufferedReader reader = null;
-        List<String> lines = new ArrayList<>();
-        try{
-            reader = new BufferedReader(new InputStreamReader(context.getAssets().open("mueller.dict"), StandardCharsets.UTF_8));
-            String line;
-            while((line = reader.readLine()) != null){
-                lines.add(line);
-            }
-        }
-        catch (IOException e){
-            Log.d("Ошибка чтения", "Ошибка чтения файла");
-        }
-        finally {
-            if (reader != null){
-                try{
-                    reader.close();
-                } catch (IOException e) {
-                    Log.d("Ошибка при закрытии", "Ошибка при закрытии буфера чтения");
-                }
-            }
-        }
-        return parseData(lines);
-    }
-
-    private static Map<String, String> loadFromAssets2(Context context){
         BufferedReader reader = null;
         List<String> lines = new ArrayList<>();
         Map<String, String> newDictionary = new HashMap<>();
@@ -137,5 +111,9 @@ public class DictionaryManager {
 
     public static String getTranslation(String word){
         return dictionary.getOrDefault(word, "");
+    }
+
+    public static int getDictSize(){
+        return keys.size();
     }
 }
