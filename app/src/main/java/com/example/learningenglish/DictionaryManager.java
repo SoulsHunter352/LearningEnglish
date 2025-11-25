@@ -19,37 +19,38 @@ public class DictionaryManager {
     private static Map<String, String> dictionary = new HashMap<>();
     private static Random random = new Random();
     private static List<String> keys = new ArrayList<>();
+    private static final Pattern regex =
+            Pattern.compile("(?:_[a-zа-я]+\\.\\s*|\\d+\\)\\s*)([а-яА-ЯёЁ][а-яА-ЯёЁ\\s\"\\-,]*?)(?=[,;]|$)");
 
     public static void loadDictionary(Context context){
         dictionary = loadFromAssets(context);
         keys = new ArrayList<>(dictionary.keySet());
     }
+
     private static Map<String, String> loadFromAssets(Context context){
         BufferedReader reader = null;
-        List<String> lines = new ArrayList<>();
         Map<String, String> newDictionary = new HashMap<>();
         try{
             reader = new BufferedReader(new InputStreamReader(context.getAssets().open("mueller.dict"), StandardCharsets.UTF_8));
             String line;
-            int lineIndex = 0;
             int translatedWords = 0;
-            List<String> currentWordLines = new ArrayList<>();
+            boolean isInWord = false;  // Параметр, который указывает, смотрим ли мы сейчас слово
+            String currentWord = "";
 
             while((line = reader.readLine()) != null){
-                // lines.add(line);
                 if(!line.isEmpty() && Character.isLetter(line.charAt(0))){
-                    if(!currentWordLines.isEmpty()){
-                        String word = currentWordLines.get(0);
-                        String translation = getTranslation(currentWordLines);
-                        if(translation != null){
-                            newDictionary.put(word, translation);
-                            translatedWords += 1;
-                        }
-                        currentWordLines = new ArrayList<>();
+                    isInWord = true;
+                    currentWord = line;
+                }
+                else if(!line.isEmpty() && isInWord){
+                    Matcher matcher = regex.matcher(line);
+                    if(matcher.find()){
+                        String translation = matcher.group(1);
+                        newDictionary.put(currentWord, translation);
+                        translatedWords += 1;
+                        isInWord = false;
                     }
                 }
-                currentWordLines.add(line);
-                lineIndex += 1;
             }
             Log.d("Количество слов ", "" + translatedWords);
         }
@@ -66,43 +67,6 @@ public class DictionaryManager {
             }
         }
         return newDictionary;
-    }
-
-    private static Map<String, String> parseData(List<String> lines){
-        Map<String, String> newDictionary = new HashMap<>();
-        int lineIndex = 0;
-        int translatedWords = 0;
-        List<String> currentWordLines = new ArrayList<>();
-        while(lineIndex < lines.size()){
-            String line = lines.get(lineIndex);
-            if(!line.isEmpty() && Character.isLetter(line.charAt(0))){
-                if(!currentWordLines.isEmpty()){
-                    String word = currentWordLines.get(0);
-                    String translation = getTranslation(currentWordLines);
-                    if(translation != null){
-                        newDictionary.put(word, translation);
-                        translatedWords += 1;
-                    }
-                    currentWordLines = new ArrayList<>();
-                }
-            }
-            currentWordLines.add(line);
-            lineIndex += 1;
-        }
-        Log.d("Количество слов ", "" + translatedWords);
-        return newDictionary;
-    }
-
-    private static String getTranslation(List<String> wordLines){
-        String pattern = "(?:_[a-zа-я]+\\.\\s*|\\d+\\)\\s*)([а-яА-ЯёЁ][а-яА-ЯёЁ\\s\"\\-,]*?)(?=[,;]|$)";
-        Pattern regex = Pattern.compile(pattern);
-        for(String line: wordLines){
-            Matcher matcher = regex.matcher(line);
-            if(matcher.find()){
-                return matcher.group(1);
-            }
-        }
-        return null;
     }
 
     public static String getRandomWord(){
