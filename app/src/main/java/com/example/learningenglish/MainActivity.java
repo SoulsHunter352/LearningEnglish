@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
         prefEditor.putInt("seconds", secondsPicker.getValue());
         prefEditor.putBoolean("mode", mode.isChecked());
         prefEditor.putBoolean("notificationStatus", notificationStatus.isChecked());
+        prefEditor.putInt("intervalMillis", getCurrentInterval());
         prefEditor.apply();
         //AlarmScheduler.stopAlarms(this);
         //AlarmScheduler.startNotifications(this, getCurrentInterval(), mode.isChecked());
@@ -131,7 +132,8 @@ public class MainActivity extends AppCompatActivity {
     protected void startNotifications(){
         // Функция инициализации отправки уведомлений
         new Thread(() ->{
-            AlarmScheduler.startNotifications(MainActivity.this, getCurrentInterval(), mode.isChecked());
+            AlarmScheduler.closeNotification(MainActivity.this);
+            AlarmScheduler.startNotifications(MainActivity.this);
         }).start();
         // AlarmScheduler.startNotifications(this, getCurrentInterval(), mode.isChecked());
     }

@@ -38,7 +38,6 @@ public class TimeNotification extends BroadcastReceiver {
     public void receiveSimpleNotification(Context context, Intent intent){
         String title = intent.getStringExtra("TITLE");
         String text = intent.getStringExtra("TEXT");
-        String mode = intent.getStringExtra("MODE");
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
@@ -47,8 +46,7 @@ public class TimeNotification extends BroadcastReceiver {
                 .setPriority(NotificationCompat.PRIORITY_HIGH);
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(NOTIFICATION_ID, builder.build());
-        AlarmScheduler.startNotifications(context, intent.getLongExtra("INTERVAL", 10000),
-                Objects.equals(mode, "CHECK_ANSWER"));
+        AlarmScheduler.startNotifications(context);
     }
 
     public void receiveTestNotification(Context context, Intent intent){
@@ -56,23 +54,24 @@ public class TimeNotification extends BroadcastReceiver {
         String text = intent.getStringExtra("TEXT");
         String rightTranslation = intent.getStringExtra("RIGHT_ANSWER");
         String wrongTranslation = intent.getStringExtra("WRONG_ANSWER");
-        long interval = intent.getLongExtra("INTERVAL", 10000);
+        //long interval = intent.getLongExtra("INTERVAL", 10000);
 
         Intent intentRight = new Intent(context, TimeNotification.class);
         intentRight.putExtra("TITLE", "Верно!");
         intentRight.putExtra("TEXT", text + " - " + rightTranslation);
         intentRight.putExtra("MODE", "CHECK_ANSWER");
-        intentRight.putExtra("INTERVAL", interval);
+        //intentRight.putExtra("INTERVAL", interval);
 
         Intent intentWrong = new Intent(context, TimeNotification.class);
         intentWrong.putExtra("TITLE", "Неверно!");
         intentWrong.putExtra("TEXT", text + " - " + rightTranslation);
         intentWrong.putExtra("MODE", "CHECK_ANSWER");
-        intentWrong.putExtra("INTERVAL", interval);
+        //
+        // intentWrong.putExtra("INTERVAL", interval);
 
-        PendingIntent pendingRightIntent = PendingIntent.getBroadcast(context, 0, intentRight,
+        PendingIntent pendingRightIntent = PendingIntent.getBroadcast(context, 1, intentRight,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        PendingIntent pendingWrongIntent = PendingIntent.getBroadcast(context, 1, intentWrong,
+        PendingIntent pendingWrongIntent = PendingIntent.getBroadcast(context, 2, intentWrong,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
         Random random = new Random();
@@ -95,5 +94,6 @@ public class TimeNotification extends BroadcastReceiver {
 
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(NOTIFICATION_ID, builder.build());
+        AlarmScheduler.startNotifications(context);
     }
 }
