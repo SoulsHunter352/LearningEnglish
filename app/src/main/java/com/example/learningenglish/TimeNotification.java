@@ -54,20 +54,16 @@ public class TimeNotification extends BroadcastReceiver {
         String text = intent.getStringExtra("TEXT");
         String rightTranslation = intent.getStringExtra("RIGHT_ANSWER");
         String wrongTranslation = intent.getStringExtra("WRONG_ANSWER");
-        //long interval = intent.getLongExtra("INTERVAL", 10000);
 
         Intent intentRight = new Intent(context, TimeNotification.class);
         intentRight.putExtra("TITLE", "Верно!");
         intentRight.putExtra("TEXT", text + " - " + rightTranslation);
         intentRight.putExtra("MODE", "CHECK_ANSWER");
-        //intentRight.putExtra("INTERVAL", interval);
 
         Intent intentWrong = new Intent(context, TimeNotification.class);
         intentWrong.putExtra("TITLE", "Неверно!");
         intentWrong.putExtra("TEXT", text + " - " + rightTranslation);
         intentWrong.putExtra("MODE", "CHECK_ANSWER");
-        //
-        // intentWrong.putExtra("INTERVAL", interval);
 
         PendingIntent pendingRightIntent = PendingIntent.getBroadcast(context, 1, intentRight,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);

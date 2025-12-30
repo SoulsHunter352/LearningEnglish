@@ -32,7 +32,6 @@ public class AlarmScheduler {
 
         // Создаем намерение для запуска BroadcastReceiver
         Intent intent = new Intent(context, TimeNotification.class);
-        intent.putExtra("INTERVAL", intervalMillis);;
 
         if(!mode){
             intent.putExtra("MODE", "LEARNING");
